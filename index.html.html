@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secret Santa - Virtual Gift</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    .gift:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background-color: #333;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .gift i {
+      transition: transform 0.3s ease;
+    }
+
+    .gift:hover i {
+      transform: rotate(15deg);
+    }
+  </style>
+</head>
+<body class="font-roboto bg-gray-100">
+  <!-- Navbar -->
+  <nav class="bg-white bg-opacity-90 shadow-md sticky top-0 z-10">
+    <div class="container mx-auto px-4 py-2 flex justify-between items-center">
+      <a class="text-3xl font-great-vibes text-black font-bold" href="#">Secret Santa</a>
+      <ul class="hidden md:flex space-x-6">
+        <li><a class="text-gray-600 hover:text-black font-bold" href="#">Home</a></li>
+        <li><a class="text-gray-600 hover:text-black font-bold" href="#">About</a></li>
+        <li><a class="text-gray-600 hover:text-black font-bold" href="#">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-12">
+    <div class="max-w-lg mx-auto bg-white bg-opacity-90 shadow-lg rounded-lg p-8">
+      <h1 class="text-4xl font-great-vibes text-center text-black font-bold">Welcome to Secret Santa</h1>
+      <p class="mt-4 text-center text-gray-600 font-bold">Select a gift wish to send to your favorite person:</p>
+      <div class="grid grid-cols-2 gap-6 mt-6">
+        <div class="gift bg-gray-100 p-6 border border-gray-300 rounded-lg text-center cursor-pointer hover:bg-gray-200" onclick="selectGift('Hug')">
+          <i class="fas fa-hand-holding-heart text-black text-2xl"></i>
+          <p class="mt-2 text-gray-700 font-semibold">Hug</p>
+        </div>
+        <div class="gift bg-gray-100 p-6 border border-gray-300 rounded-lg text-center cursor-pointer hover:bg-gray-200" onclick="selectGift('Kiss')">
+          <i class="fas fa-kiss text-black text-2xl"></i>
+          <p class="mt-2 text-gray-700 font-semibold">Kiss</p>
+        </div>
+        <div class="gift bg-gray-100 p-6 border border-gray-300 rounded-lg text-center cursor-pointer hover:bg-gray-200" onclick="selectGift('I Like You')">
+          <i class="fas fa-heart text-black text-2xl"></i>
+          <p class="mt-2 text-gray-700 font-semibold">I Like You</p>
+        </div>
+        <div class="gift bg-gray-100 p-6 border border-gray-300 rounded-lg text-center cursor-pointer hover:bg-gray-200" onclick="selectGift('Romantic Dinner')">
+          <i class="fas fa-wine-glass-alt text-black text-2xl"></i>
+          <p class="mt-2 text-gray-700 font-semibold">Romantic Dinner</p>
+        </div>
+      </div>
+
+      <!-- Question Section -->
+      <div class="question-section mt-8 hidden" id="questionSection">
+        <h2 class="text-2xl font-great-vibes text-black font-bold">Enter Your Custom Question and Answer</h2>
+        <input class="mt-2 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black" id="customQuestion" placeholder="Enter a custom question" type="text"/>
+        <input class="mt-2 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black" id="customAnswer" placeholder="Enter the correct answer" type="text"/>
+        <button class="mt-4 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 font-bold" onclick="generateLink()">Generate Link</button>
+        <p class="mt-2 text-red-600 font-bold" id="feedback"></p>
+      </div>
+
+      <!-- Share Gift Section -->
+      <div class="mt-8 text-center">
+        <button class="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 font-bold" onclick="shareGiftLink()">Share Your Gift</button>
+        <div id="linkContainer" class="mt-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white bg-opacity-90 shadow-md py-6">
+    <div class="container mx-auto px-4 text-center">
+      <p class="text-gray-600 font-bold">© 2024 Secret Santa. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    let selectedGift = '';
+    let customQuestion = '';
+    let correctAnswer = '';
+    
+    function selectGift(gift) {
+      selectedGift = gift;
+      document.getElementById('questionSection').style.display = 'block';
+      document.getElementById('feedback').textContent = '';
+    }
+
+    function generateLink() {
+      customQuestion = document.getElementById('customQuestion').value.trim();
+      correctAnswer = document.getElementById('customAnswer').value.trim();
+      
+      if (!customQuestion || !correctAnswer) {
+        document.getElementById('feedback').textContent = 'Please fill in both question and answer!';
+        return;
+      }
+
+      const uniqueLink = generateUniqueLink();
+      document.getElementById('linkContainer').innerHTML = `
+        <p class="mt-4 text-gray-700 font-semibold">Your sharable link:</p>
+        <a href="${uniqueLink}" target="_blank" class="block mt-2 text-blue-500 font-bold underline">${uniqueLink}</a>
+      `;
+    }
+
+    function generateUniqueLink() {
+      const uniqueId = Date.now(); // Using timestamp for a unique ID
+      const baseUrl = `https://yoursecretsanta.com/receive-gift`;
+      return `${baseUrl}?gift=${encodeURIComponent(selectedGift)}&question=${encodeURIComponent(customQuestion)}&answer=${encodeURIComponent(correctAnswer)}&id=${uniqueId}`;
+    }
+
+    function shareGiftLink() {
+      if (!selectedGift) {
+        alert("Please select a gift first!");
+        return;
+      }
+
+      const friendName = prompt("Enter your friend's name:");
+      if (!friendName) {
+        alert("Friend's name is required to share the gift.");
+        return;
+      }
+
+      const shareMessage = prompt("Write a custom message to your friend:");
+      const uniqueLink = generateUniqueLink();
+
+      const linkContainer = document.getElementById("linkContainer");
+      linkContainer.innerHTML = `
+        <p class="mt-4 text-gray-700 font-semibold">Share this link with your friend:</p>
+        <a href="${uniqueLink}" target="_blank" class="block mt-2 text-blue-500 font-bold underline">${uniqueLink}</a>
+      `;
+    }
+  </script>
+</body>
+</html>
